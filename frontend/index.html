@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>TechSpark Multi-Language Docker Compiler</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>TechSpark Compiler</h1>
+
+    <!-- Language -->
+
+    <div class="language-section">
+
+        <label>Select Language</label>
+
+        <select id="language">
+
+            <option value="python">Python</option>
+
+            <option value="java">Java</option>
+
+            <option value="c">C</option>
+
+            <option value="cpp">C++</option>
+
+        </select>
+
+    </div>
+
+    <!-- Monaco Editor -->
+
+    <div class="editor-section">
+
+        <label>Source Code</label>
+
+        <div id="editor"></div>
+
+    </div>
+
+    <!-- Program Input -->
+
+    <div class="input-section" id="inputSection" style="display:none;">
+
+        <label>Program Input</label>
+
+        <textarea
+            id="input"
+            placeholder="Enter program input here..."
+        ></textarea>
+
+    </div>
+
+    <!-- Buttons -->
+
+    <div class="button-section">
+
+        <button onclick="runCode()">Run Code</button>
+
+        <button onclick="clearEditor()">Clear</button>
+
+    </div>
+
+    <!-- Output -->
+
+    <div class="output-section">
+
+        <label>Output</label>
+
+        <pre id="output">Program output will appear here...</pre>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
