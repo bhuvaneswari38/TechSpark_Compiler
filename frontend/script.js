@@ -190,7 +190,7 @@ async function runCode(){
 
     try{
 
-        const response = await fetch("https://contained-likes-grand-led.trycloudflare.com/run",{
+        const response = await fetch("http://localhost:5000/deploy",{
 
             method:"POST",
 
