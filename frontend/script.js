@@ -1,253 +1,177 @@
-// ------------------------
-// Monaco Editor
-// ------------------------
 
-let editor;
+const API_URL = "http://localhost:5000/deploy";
+
+const languageSelect = document.getElementById("language");
+const inputSection = document.getElementById("inputSection");
+const programInput = document.getElementById("input");
+const output = document.getElementById("output");
+const runButton = document.getElementById("runButton");
+const clearButton = document.getElementById("clearButton");
+const editorContainer = document.getElementById("editorContainer");
+
+let editor = null;
+
+const starterCode = {
+    python: 'print("Hello TechSpark")',
+    c: `#include <stdio.h>
+
+int main() {
+    printf("Hello TechSpark\\n");
+    return 0;
+}`,
+    cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello TechSpark" << endl;
+    return 0;
+}`,
+    java: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello TechSpark");
+    }
+}`
+};
+
+const monacoLanguages = {
+    python: "python",
+    c: "c",
+    cpp: "cpp",
+    java: "java"
+};
+
+function requiresInput(code, language) {
+    switch (language) {
+        case "python":
+            return /\binput\s*\(/.test(code);
+        case "c":
+            return /\bscanf\s*\(/.test(code) ||
+                   /\bgetchar\s*\(/.test(code) ||
+                   /\bfgets\s*\(/.test(code);
+        case "cpp":
+            return /cin\s*>>|getline\s*\(/.test(code);
+        case "java":
+            return /\bScanner\b/.test(code) ||
+                   /\.(next|nextLine|nextInt|nextDouble|nextFloat|nextBoolean)\s*\(/.test(code);
+        default:
+            return false;
+    }
+}
+
+function updateInputVisibility() {
+    if (!editor) return;
+
+    inputSection.hidden = !requiresInput(
+        editor.getValue(),
+        languageSelect.value
+    );
+}
+
+function changeLanguage() {
+    if (!editor) return;
+
+    const language = languageSelect.value;
+
+    editor.setValue(starterCode[language]);
+    monaco.editor.setModelLanguage(
+        editor.getModel(),
+        monacoLanguages[language]
+    );
+
+    programInput.value = "";
+    output.textContent = "Program output will appear here...";
+    updateInputVisibility();
+    editor.focus();
+}
+
+languageSelect.addEventListener("change", changeLanguage);
 
 require.config({
     paths: {
-        vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs"
+        vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs"
     }
 });
 
 require(["vs/editor/editor.main"], function () {
-
-    editor = monaco.editor.create(document.getElementById("editor"), {
-
-        value: `print("Hello TechSpark")`,
-
+    editor = monaco.editor.create(editorContainer, {
+        value: starterCode.python,
         language: "python",
-
         theme: "vs-dark",
-
         automaticLayout: true,
-
-        fontSize: 16,
-
         lineNumbers: "on",
-
-        minimap: {
-            enabled: false
-        },
-
-        autoIndent: "full",
-
-        formatOnType: true,
-
-        formatOnPaste: true,
-
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
         tabSize: 4,
-
-        insertSpaces: true
-
+        insertSpaces: true,
+        autoIndent: "full",
+        formatOnType: true,
+        fontSize: 14,
+        wordWrap: "on",
+        padding: { top: 10, bottom: 10 }
     });
 
+    editor.onDidChangeModelContent(updateInputVisibility);
+
+    updateInputVisibility();
 });
 
-
-// ------------------------
-// Change Language
-// ------------------------
-
-// ------------------------
-// Change Language
-// ------------------------
-
-document.getElementById("language").addEventListener("change", function () {
-
-    const lang = this.value;
-
-    monaco.editor.setModelLanguage(
-        editor.getModel(),
-        lang
-    );
-
-    let starterCode = "";
-
-    switch(lang){
-
-        case "python":
-
-            starterCode =
-`print("Hello TechSpark")`;
-
-            break;
-
-        case "c":
-
-            starterCode =
-`#include <stdio.h>
-
-int main(){
-
-    printf("Hello TechSpark");
-
-    return 0;
-}`;
-
-            break;
-
-        case "cpp":
-
-            starterCode =
-`#include <iostream>
-using namespace std;
-
-int main(){
-
-    cout << "Hello TechSpark";
-
-    return 0;
-}`;
-
-            break;
-
-        case "java":
-
-            starterCode =
-`public class Main{
-
-    public static void main(String[] args){
-
-        System.out.println("Hello TechSpark");
-
+async function runCode() {
+    if (!editor) {
+        output.textContent = "The code editor is still loading. Please wait.";
+        return;
     }
 
-}`;
-
-            break;
-
-    }
-
-    editor.setValue(starterCode);
-
-    document.getElementById("inputSection").style.display = "none";
-
-    document.getElementById("input").value = "";
-
-    document.getElementById("output").innerText =
-        "Program output will appear here...";
-
-});
-
-// ------------------------
-// Detect Program Input
-// ------------------------
-
-function requiresInput(code, language){
-
-    code = code.toLowerCase();
-
-    switch(language){
-
-        case "python":
-            return code.includes("input(");
-
-        case "c":
-            return code.includes("scanf(");
-
-        case "cpp":
-            return code.includes("cin");
-
-        case "java":
-            return code.includes("scanner") || code.includes("nextint(") || code.includes("nextline(");
-
-        default:
-            return false;
-
-    }
-
-}
-
-
-// ------------------------
-// Run Code
-// ------------------------
-
-async function runCode(){
-
+    const language = languageSelect.value;
     const code = editor.getValue();
+    const input = programInput.value;
 
-    const language = document.getElementById("language").value;
+    updateInputVisibility();
+    output.textContent = "Running...";
+    runButton.disabled = true;
+    runButton.textContent = "Running...";
 
-    const inputSection = document.getElementById("inputSection");
-
-    if(requiresInput(code, language)){
-
-        inputSection.style.display = "block";
-
-    }
-
-    else{
-
-        inputSection.style.display = "none";
-
-    }
-
-    const input = document.getElementById("input").value;
-
-    document.getElementById("output").innerText = "Running...";
-
-    try{
-
-        const response = await fetch("https://contained-likes-grand-led.trycloudflare.com/run",{
-
-            method:"POST",
-
-            headers:{
-                "Content-Type":"application/json"
-            },
-
-            body: JSON.stringify({
-
-                language: language,
-
-                code: code,
-
-                input: input
-
-            })
-
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ language, code, input })
         });
 
         const data = await response.json();
 
-        if(data.success){
-
-            document.getElementById("output").innerText = data.output;
-
+        if (!response.ok) {
+            output.textContent =
+                data.error || `Request failed: HTTP ${response.status}`;
+        } else if (data.success) {
+            output.textContent =
+                data.output || "(Program finished with no output)";
+        } else {
+            output.textContent =
+                data.error || "Program execution failed.";
         }
-
-        else{
-
-            document.getElementById("output").innerText = data.error;
-
-        }
-
+    } catch (error) {
+        output.textContent =
+            "Connection error. Make sure the TechSpark backend is running at " +
+            API_URL + ". Details: " + error.message;
+    } finally {
+        runButton.disabled = false;
+        runButton.textContent = "Run Code";
     }
-
-    catch(error){
-
-        document.getElementById("output").innerText = "Connection Error : " + error;
-
-    }
-
 }
 
-
-// ------------------------
-// Clear Editor
-// ------------------------
-
-function clearEditor(){
+function clearEditor() {
+    if (!editor) return;
 
     editor.setValue("");
-
-    document.getElementById("input").value = "";
-
-    document.getElementById("output").innerText =
-        "Program output will appear here...";
-
-    document.getElementById("inputSection").style.display = "none";
-
+    programInput.value = "";
+    output.textContent = "Program output will appear here...";
+    updateInputVisibility();
+    editor.focus();
 }
+
+runButton.addEventListener("click", runCode);
+clearButton.addEventListener("click", clearEditor);
+
+window.addEventListener("resize", () => {
+    if (editor) editor.layout();
+});

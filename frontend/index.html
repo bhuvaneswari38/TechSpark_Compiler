@@ -1,89 +1,56 @@
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-    <title>TechSpark Multi-Language Docker Compiler</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechSpark Multi-Language Compiler</title>
     <link rel="stylesheet" href="style.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
-
 </head>
-
 <body>
+    <main class="container">
+        <h1>TechSpark Compiler</h1>
+        <p class="subtitle">Write, run, and test code in four languages.</p>
 
-<div class="container">
+        <section class="language-section">
+            <label for="language">Select Language</label>
+            <select id="language">
+                <option value="python">Python</option>
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+            </select>
+        </section>
 
-    <h1>TechSpark Compiler</h1>
+        <section class="editor-section">
+            <label for="editorContainer">Source Code</label>
 
-    <!-- Language -->
+            <div id="editorContainer"
+                role="region"
+                aria-label="Source code editor"
+                style="height: 420px; width: 100%; overflow: hidden; border-radius: 6px;">
+            </div>
 
-    <div class="language-section">
+            <p class="hint">Monaco Editor supports line numbers, syntax highlighting, and automatic indentation.</p>
+        </section>
 
-        <label>Select Language</label>
+        <section id="inputSection" class="input-section" hidden>
+            <label for="input">Program Input</label>
+            <textarea id="input" placeholder="Enter input for your program, one value per line"></textarea>
+        </section>
 
-        <select id="language">
+        <div class="button-section">
+            <button id="runButton" type="button">Run Code</button>
+            <button id="clearButton" class="secondary" type="button">Clear</button>
+        </div>
 
-            <option value="python">Python</option>
+        <section class="output-section">
+            <label for="output">Output / Errors</label>
+            <pre id="output" aria-live="polite">Program output will appear here...</pre>
+        </section>
+    </main>
 
-            <option value="java">Java</option>
-
-            <option value="c">C</option>
-
-            <option value="cpp">C++</option>
-
-        </select>
-
-    </div>
-
-    <!-- Monaco Editor -->
-
-    <div class="editor-section">
-
-        <label>Source Code</label>
-
-        <div id="editor"></div>
-
-    </div>
-
-    <!-- Program Input -->
-
-    <div class="input-section" id="inputSection" style="display:none;">
-
-        <label>Program Input</label>
-
-        <textarea
-            id="input"
-            placeholder="Enter program input here..."
-        ></textarea>
-
-    </div>
-
-    <!-- Buttons -->
-
-    <div class="button-section">
-
-        <button onclick="runCode()">Run Code</button>
-
-        <button onclick="clearEditor()">Clear</button>
-
-    </div>
-
-    <!-- Output -->
-
-    <div class="output-section">
-
-        <label>Output</label>
-
-        <pre id="output">Program output will appear here...</pre>
-
-    </div>
-
-</div>
-
-<script src="script.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+    <script src="script.js"></script>
 </body>
-
 </html>
